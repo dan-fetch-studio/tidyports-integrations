@@ -1,0 +1,19 @@
+{
+  "name": "@tidyports/mcp",
+  "version": "0.1.0",
+  "description": "MCP server exposing the tidy-ports CLI (deploy / list / kill / alloc) as structured, safety-gated tools for any MCP client.",
+  "type": "module",
+  "bin": {
+    "tidyports-mcp": "server.js"
+  },
+  "files": [
+    "server.js"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.18.0",
+    "zod": "^3.23.8"
+  }
+}
