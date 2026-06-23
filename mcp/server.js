@@ -120,4 +120,29 @@ server.registerTool(
   }
 );
 
+// free_port — a collision-free port to use RIGHT NOW, before binding. Stateless
+// sibling of alloc_port: no sticky per-worktree assignment, just the first port
+// in the range that nothing is currently listening on.
+server.registerTool(
+  "free_port",
+  {
+    title: "Get a free port to bind now",
+    description:
+      "Return a single TCP port that is NOT currently in use, so you can bind a server without an EADDRINUSE collision. Stateless — for a STABLE port that's remembered per worktree across restarts, use alloc_port instead.",
+    inputSchema: {
+      range: z
+        .string()
+        .regex(/^\d+-\d+$/, "range must look like START-END, e.g. 3000-3999")
+        .optional()
+        .describe("Port range to search, e.g. 8000-8099 (default 3000-3999)"),
+    },
+  },
+  async ({ range }) => {
+    const args = ["free-port"];
+    if (range) args.push("--range", range);
+    const port = Number(await tidyPorts(args));
+    return asJson({ port });
+  }
+);
+
 await server.connect(new StdioServerTransport());
