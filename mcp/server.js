@@ -1,9 +1,12 @@
 #!/usr/bin/env node
-// TidyPorts MCP server — exposes the `tidy-ports` CLI as structured, safety-gated tools
-// for any MCP client (Claude Code, Cursor, Claude Desktop, …). Unlike the Claude Code
-// *skill* (which advises the model how to shell out), these tools take typed inputs,
-// return structured results, and ENFORCE the deploy safety in code: a public deploy is
-// refused unless the caller passes confirmed:true. Thin wrapper — the CLI does the work.
+// TidyPorts MCP server — exposes the `tidy-ports` CLI as structured tools for any MCP
+// client (Claude Code, Cursor, Claude Desktop, …). Unlike the Claude Code *skill* (which
+// advises the model how to shell out), these tools take typed inputs and return
+// structured results. Thin wrapper — the CLI does the work.
+//
+// Phase 1 ships TidyPorts as a free local utility, so publishing is not exposed here:
+// the `deploy` handler below is kept intact but is NOT registered, so no agent can
+// discover or call it. Re-register it in phase 2 when publishing returns.
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -60,12 +63,17 @@ server.registerTool(
   }
 );
 
-// share — deploy off-machine. The safety is ENFORCED here, not merely advised: a public
-// production deploy is refused unless confirmed:true, so the model cannot make something
-// world-readable without the user agreeing first.
-server.registerTool(
-  "deploy",
-  {
+// share — deploy off-machine. NOT REGISTERED in phase 1 (see the file header): TidyPorts
+// launches as a free local utility with no publishing surface, so this tool is withheld
+// from the advertised tool list and an agent cannot discover or call it. The definition
+// and its safety gate are kept verbatim so phase 2 is a single `server.registerTool(...)`
+// call away. The safety gate is ENFORCED, not merely advised: a public production deploy
+// is refused unless confirmed:true, so the model cannot make something world-readable
+// without the user agreeing first.
+// eslint-disable-next-line no-unused-vars
+const deployTool = {
+  name: "deploy",
+  config: {
     title: "Deploy a web project (public, off-machine)",
     description:
       "Deploy a web project to Vercel and return a public URL that runs OFF the user's machine (nothing served from their laptop). A production deploy is world-readable: set confirmed:true ONLY after the user has explicitly agreed to make it public, and never deploy a project with secrets baked into the client bundle. For a private, Vercel-login-gated link, pass preview:true instead.",
@@ -75,10 +83,10 @@ server.registerTool(
       confirmed: z.boolean().optional().describe("Set true ONLY after the user has confirmed a PUBLIC deploy"),
     },
   },
-  async ({ path = ".", preview = false, confirmed = false }) => {
+  handler: async ({ path = ".", preview = false, confirmed = false }) => {
     if (!preview && !confirmed) {
       return asText(
-        "Refused — a production deploy is PUBLIC and world-readable. Confirm with the user " +
+        "Refused: a production deploy is PUBLIC and world-readable. Confirm with the user " +
           "that they want this public, then call deploy again with confirmed:true. For a " +
           "private link, pass preview:true (Vercel-login-gated). Also verify the project has " +
           "no secrets baked into the client bundle before deploying."
@@ -88,8 +96,9 @@ server.registerTool(
     if (preview) args.push("--preview");
     const url = await tidyPorts(args);
     return asJson({ url, public: !preview });
-  }
-);
+  },
+};
+void deployTool; // referenced so linters don't strip the phase-2 definition
 
 // kill — stop one dev server by port.
 server.registerTool(
