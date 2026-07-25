@@ -15,5 +15,21 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.18.0",
     "zod": "^3.23.8"
-  }
+  },
+  "mcpName": "io.github.dan-fetch-studio/tidyports",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dan-fetch-studio/TidyPorts.git"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "keywords": [
+    "mcp",
+    "modelcontextprotocol",
+    "ports",
+    "localhost",
+    "dev-server",
+    "claude-code",
+    "cursor",
+    "macos"
+  ]
 }

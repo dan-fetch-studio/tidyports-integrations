@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.dan-fetch-studio/tidyports",
+  "description": "See and control the local dev servers your coding agents leave running: list them with provenance, kill strays, and allocate collision-free ports so parallel agents stop fighting over :3000.",
+  "version": "0.1.0",
+  "repository": {
+    "url": "https://github.com/dan-fetch-studio/TidyPorts",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@tidyports/mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
