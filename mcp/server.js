@@ -28,7 +28,15 @@ async function tidyPorts(args, { timeout = 180_000 } = {}) {
     return stdout.trim();
   } catch (err) {
     if (err.code === "ENOENT") {
-      throw new Error("`tidy-ports` is not on PATH — install TidyPorts first.");
+      // This string is a distribution surface, not just an error. An agent relays it
+      // to the user verbatim, at the exact moment they asked about their ports — so it
+      // has to carry the URL. Without one the agent guesses, and the user lands among
+      // the dozen other port tools instead of ours.
+      throw new Error(
+        "`tidy-ports` is not on PATH. TidyPorts (free, macOS 15+) provides it: " +
+        "https://tidyports.app/download — or `brew install --cask dan-fetch-studio/tap/tidyports`. " +
+        "Once installed, retry this tool."
+      );
     }
     const detail = (err.stderr || err.message || "").toString().trim();
     throw new Error(detail || `tidy-ports ${args.join(" ")} failed`);

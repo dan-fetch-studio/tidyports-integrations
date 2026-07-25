@@ -1,6 +1,6 @@
 {
   "name": "@tidyports/mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server exposing the tidy-ports CLI (list / kill / alloc / free-port) as structured tools for any MCP client.",
   "type": "module",
   "bin": {
