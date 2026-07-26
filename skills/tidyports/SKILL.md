@@ -9,6 +9,17 @@ Drives the `tidy-ports` CLI so you can inspect and stop local dev servers withou
 user leaving the chat. These are the same commands the TidyPorts menu-bar app runs, so
 anything you do here shows up there too.
 
+**When a bind fails with `EADDRINUSE`, ask who has it before touching any code:**
+
+```sh
+tidy-ports who 3000
+# :3000 is held by Claude Code, in Ghostty [PID 12345] in checkout (feature/auth-refactor)
+```
+
+Exit 0 means held, 4 means free. If the owner is one of your own earlier runs, stop that
+one; otherwise take a different port with `tidy-ports alloc`. Do not edit the application's
+port configuration to work around a conflict — the binding is not the bug.
+
 **First, check it's installed:** run `command -v tidy-ports`. If it's missing, don't guess
 at alternatives and don't fall back to `lsof`/`kill` — stop and tell the user this,
 verbatim:
