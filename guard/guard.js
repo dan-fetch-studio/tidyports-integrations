@@ -52,11 +52,26 @@ function whoHolds(port) {
 
 let reported = false;
 
+/* stderr arrives in whatever chunks the pipe hands over, and there is no promise
+   a line survives whole — a message split mid-sentence used to be missed
+   silently, which is the worst kind of miss, because short errors usually do
+   arrive intact and it looks like it works. So matching runs against a rolling
+   tail rather than a single chunk.
+
+   Bounded, because a dev server can log for hours: only the last few KB are
+   kept, which is far more than any one bind error, and the buffer is released
+   the moment there is nothing left to look for. The patterns never cross a
+   newline, so rejoining chunks cannot invent a match that wasn't there. */
+const TAIL_MAX = 8192;
+let tail = "";
+
 function explain(chunk) {
   if (reported) return;
-  const port = portFrom(chunk);
+  tail = (tail + chunk).slice(-TAIL_MAX);
+  const port = portFrom(tail);
   if (!port) return;
   reported = true;
+  tail = "";
 
   const answer = whoHolds(port);
   if (!answer) {

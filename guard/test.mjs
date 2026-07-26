@@ -87,6 +87,27 @@ check(r.status === 1, "bind failure keeps the child's exit code", `got ${r.statu
 check(r.stderr.includes("[tidyports]"), "bind failure is explained");
 check(r.stderr.includes("45771"), "the explanation names the port");
 
+/* Regression: stderr arrives in whatever chunks the pipe hands over, and a
+   message split mid-sentence was silently missed. Short errors usually do
+   arrive whole, so this looked like it worked. */
+r = run([
+  "node",
+  "-e",
+  "const e='Error: listen EADDRINUSE: address already in use :::45771';" +
+    "process.stderr.write(e.slice(0,28));" +
+    "setTimeout(()=>{process.stderr.write(e.slice(28)+'\\n');process.exit(1);},60);",
+]);
+check(r.stderr.includes("[tidyports]"), "a split error message is still caught");
+
+/* And the rejoining must not invent matches: the patterns are newline-bounded,
+   so lines that merely mention a port stay ignored however they are chunked. */
+r = run([
+  "node",
+  "-e",
+  "for(let i=0;i<200;i++)process.stderr.write('server listening on port 3000, request '+i+'\\n');",
+]);
+check(!r.stderr.includes("[tidyports]"), "chatty output never triggers it");
+
 held.close();
 
 console.log(failures ? `\n${failures} failed` : "\nall guard tests passed");
