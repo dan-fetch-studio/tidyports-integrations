@@ -1,7 +1,7 @@
 {
   "name": "@tidyports/mcp",
-  "version": "0.1.1",
-  "description": "MCP server exposing the tidy-ports CLI (list / kill / alloc / free-port) as structured tools for any MCP client.",
+  "version": "0.1.2",
+  "description": "See and kill the dev servers your coding agents leave running, and get collision-free ports.",
   "type": "module",
   "bin": {
     "tidyports-mcp": "server.js"
@@ -19,9 +19,9 @@
   "mcpName": "io.github.dan-fetch-studio/tidyports",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dan-fetch-studio/TidyPorts.git"
+    "url": "git+https://github.com/dan-fetch-studio/tidyports-integrations.git"
   },
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "keywords": [
     "mcp",
     "modelcontextprotocol",
@@ -31,5 +31,6 @@
     "claude-code",
     "cursor",
     "macos"
-  ]
+  ],
+  "homepage": "https://tidyports.app"
 }
