@@ -24,6 +24,14 @@ These integrations give the agent a way to look, rather than guess.
 
 ## Install
 
+The skill, for any agent (Claude Code, Cursor, Copilot, Gemini…):
+
+```sh
+npx skills add dan-fetch-studio/tidyports-integrations
+```
+
+The MCP server:
+
 ```sh
 npm install -g @tidyports/mcp
 ```

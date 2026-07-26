@@ -18,9 +18,15 @@ When you're in Claude Code and say things like:
 
 ## Install
 
-Requires the `tidy-ports` CLI on your `PATH` (install TidyPorts first).
+```sh
+npx skills add dan-fetch-studio/tidyports-integrations
+```
 
-Symlink (or copy) the skill into Claude Code's skills directory:
+That installs into whichever agent you use — Claude Code, Cursor, Copilot, Gemini and
+others are all supported by the [`skills` CLI](https://github.com/vercel-labs/skills).
+
+To wire it up by hand instead, symlink the skill directory into your agent's skills
+folder:
 
 ```sh
 # global — available in every project
@@ -30,8 +36,11 @@ ln -s "$(pwd)/tidyports" ~/.claude/skills/tidyports
 ln -s "$(pwd)/tidyports" /path/to/your/project/.claude/skills/tidyports
 ```
 
-That's it. The skill triggers automatically when you ask about listing or killing dev
-servers, or when you hit a port collision.
+### It needs the TidyPorts app
 
-Prefer **structured tools** or use a client other than Claude Code (Cursor, Claude
-Desktop)? The same capabilities ship as an MCP server: see [`../mcp/`](../mcp/).
+The skill drives the `tidy-ports` CLI, which ships inside
+[TidyPorts](https://tidyports.app) (free, macOS 15+):
+
+```sh
+brew install --cask dan-fetch-studio/tap/tidyports
+```
