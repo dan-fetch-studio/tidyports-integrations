@@ -40,6 +40,7 @@ export interface Listener {
   branch: string;
   gitRoot: string;
   idle: boolean;
+  tag: string;
   mem: number | null;
   cpu: number | null;
   etime: string;
@@ -73,6 +74,35 @@ async function tidyPorts(args: string[], timeoutMs = 15000): Promise<string> {
     },
   });
   return stdout;
+}
+
+/**
+ * Mirrors `Listener.likelyDevelopment` in the app (Models.swift). The CLI reports every
+ * listening socket, which on a real Mac means ControlCenter, Figma and a row per Docker
+ * container — noise that buries the two or three things you actually care about and makes
+ * this look like any other port list.
+ *
+ * Keep this in step with the app's list, or the two surfaces will disagree about what a
+ * dev server is.
+ */
+const DEV_RUNTIMES = new Set([
+  "node", "bun", "deno", "ruby", "php", "java", "go",
+  "uvicorn", "gunicorn", "puma", "rails", "flask",
+  "dotnet", "mix", "elixir", "beam.smp", "cargo",
+  "vite", "astro", "storybook", "webpack", "tsx", "ts-node",
+  "next", "nuxt", "remix", "ng",
+]);
+
+export function isLikelyDevServer(l: Listener): boolean {
+  if (l.tag === "required" || l.tag === "context" || l.tag === "storybook") return true;
+  const name = (l.comm.split("/").pop() ?? "").toLowerCase();
+  return (
+    DEV_RUNTIMES.has(name) ||
+    name.startsWith("python") ||
+    name.startsWith("php") ||
+    // Frameworks that rename the process: Next becomes "next-server (v16…)".
+    name.startsWith("next-server")
+  );
 }
 
 export async function listServers(): Promise<Listener[]> {

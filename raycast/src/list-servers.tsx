@@ -1,6 +1,6 @@
 import { Action, ActionPanel, Alert, Color, Icon, List, Toast, confirmAlert, open, showToast } from "@raycast/api";
 import { usePromise } from "@raycast/utils";
-import { Listener, TidyPortsMissingError, killPort, listServers, provenance } from "./lib/cli";
+import { Listener, TidyPortsMissingError, isLikelyDevServer, killPort, listServers, provenance } from "./lib/cli";
 
 const DOWNLOAD_URL = "https://tidyports.app/download";
 
@@ -31,12 +31,25 @@ export default function Command() {
     );
   }
 
+  const dev = (data ?? []).filter(isLikelyDevServer);
+  const other = (data ?? []).filter((l) => !isLikelyDevServer(l));
+
   return (
     <List isLoading={isLoading} searchBarPlaceholder="Search by port, project, branch or agent…">
       <List.EmptyView icon={Icon.Check} title="Nothing listening" description="No local dev servers are running." />
-      {(data ?? []).map((l) => (
-        <ServerItem key={`${l.port}-${l.pid}`} listener={l} onChanged={revalidate} />
-      ))}
+      {/* Dev servers first. The rest of the machine's listeners — Docker, Figma,
+          ControlCenter — are real but they are not what you came here for, so they sit
+          below rather than being hidden outright. */}
+      <List.Section title="Dev servers" subtitle={dev.length ? String(dev.length) : undefined}>
+        {dev.map((l) => (
+          <ServerItem key={`${l.port}-${l.pid}`} listener={l} onChanged={revalidate} />
+        ))}
+      </List.Section>
+      <List.Section title="Other listeners" subtitle={other.length ? String(other.length) : undefined}>
+        {other.map((l) => (
+          <ServerItem key={`${l.port}-${l.pid}`} listener={l} onChanged={revalidate} />
+        ))}
+      </List.Section>
     </List>
   );
 }
