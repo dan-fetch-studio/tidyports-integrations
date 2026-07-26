@@ -1,0 +1,37 @@
+{
+  "name": "@tidyports/guard",
+  "version": "0.1.0",
+  "description": "When a dev server can't bind, say who is holding the port instead of just EADDRINUSE.",
+  "type": "module",
+  "bin": {
+    "tidyports-guard": "guard.js"
+  },
+  "files": [
+    "guard.js",
+    "detect.js"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dan-fetch-studio/tidyports-integrations.git",
+    "directory": "guard"
+  },
+  "homepage": "https://tidyports.app",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "eaddrinuse",
+    "port",
+    "address-already-in-use",
+    "dev-server",
+    "localhost",
+    "ports"
+  ],
+  "scripts": {
+    "test": "node test.mjs"
+  }
+}
