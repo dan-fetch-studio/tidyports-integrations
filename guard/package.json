@@ -20,6 +20,9 @@
   },
   "homepage": "https://tidyports.app",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "eaddrinuse",
     "port",
