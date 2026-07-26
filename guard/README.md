@@ -9,15 +9,36 @@ $ tidyports-guard npm run dev
 
 Error: listen EADDRINUSE: address already in use :::3000
 
+:3000 is held by Claude Code, in Ghostty [PID 12345] in acme-web (feature/auth)
+
+  [1] use 3001 instead
+  [2] stop it (asks again first)
+  [enter] leave it
+```
+
+Pick `1` and the port lands on your clipboard. Enter leaves everything alone, so a stray
+keystroke never stops anyone's server.
+
+Naming the owner matters most when an agent is reading it. An agent that hits a port
+conflict and can't tell it from a bug will often "fix" working code to get around the
+port — usually by editing your app's configuration. Naming the owner is what makes the
+conflict legible as a conflict.
+
+### When you get the choice, and when you don't
+
+Not everything dies when it can't bind. Vite prints `Port 5173 is in use` and carries on
+at 5174, and a prompt underneath a live dev server would be competing with its output for
+the same terminal. So the choice appears only once the command has actually exited and
+the terminal is free.
+
+If it's still running — or you're piped, in CI, or an agent is reading — you get the same
+answer as plain text instead, and nothing ever waits for input:
+
+```
 [tidyports] :3000 is held by Claude Code, in Ghostty [PID 12345] in acme-web (feature/auth)
 To take a different port:  PORT=$(tidy-ports alloc web)
 To stop it:                tidy-ports kill --match 3000
 ```
-
-That last part matters most when an agent is reading it. An agent that hits a port
-conflict and can't tell it from a bug will often "fix" working code to get around the
-port — usually by editing your app's configuration. Naming the owner is what makes the
-conflict legible as a conflict.
 
 ## Use it
 

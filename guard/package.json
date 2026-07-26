@@ -1,6 +1,6 @@
 {
   "name": "@tidyports/guard",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "When a dev server can't bind, say who is holding the port instead of just EADDRINUSE.",
   "type": "module",
   "bin": {

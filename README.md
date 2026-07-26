@@ -11,7 +11,9 @@ These integrations give the agent a way to look, rather than guess.
 | | |
 |---|---|
 | [`mcp/`](mcp/) | An [MCP](https://modelcontextprotocol.io) server — typed tools for any MCP client (Claude Code, Cursor, Claude Desktop, Windsurf, Zed). |
-| [`claude-code/`](claude-code/) | A Claude Code skill, if you'd rather it shelled out to the CLI directly. |
+| [`skills/`](skills/) | A Claude Code skill, if you'd rather it shelled out to the CLI directly. |
+| [`guard/`](guard/) | Wrap your dev command so `EADDRINUSE` names what is holding the port, instead of only saying that something is. |
+| [`raycast/`](raycast/) | A Raycast extension for the same list, without leaving the launcher. |
 
 ## Tools
 

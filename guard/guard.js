@@ -65,14 +65,33 @@ let reported = false;
 const TAIL_MAX = 8192;
 let tail = "";
 
-function explain(chunk) {
-  if (reported) return;
-  tail = (tail + chunk).slice(-TAIL_MAX);
-  const port = portFrom(tail);
-  if (!port) return;
-  reported = true;
-  tail = "";
+/* Two forms of the same answer, and which one you get depends on whether the
+   thing that failed is still running.
 
+   A process that cannot bind usually dies — node, rails, flask — and then the
+   terminal is free, you are sitting looking at the error, and the useful thing
+   is the choice `who` offers a person: take this other port, stop it, leave it.
+   But not everything dies. Vite prints "Port 5173 is in use" and carries on at
+   5174, and putting a prompt under a live dev server means competing with its
+   output for the same terminal.
+
+   So detection starts a short timer instead of deciding immediately. If the
+   child is gone before it fires, the terminal belongs to us and `who` runs
+   interactively. If it is still alive, the plain lines print and no prompt ever
+   appears. Exactly one of the two happens. */
+const SETTLE_MS = 400;
+
+let pending = null;
+
+// Can a person answer? `who` makes the same check itself, but it would see the
+// pipe we hand it and never prompt, so the decision has to be made out here.
+function canPrompt() {
+  return Boolean(
+    process.stdout.isTTY && !process.env.TP_PORCELAIN && !process.env.CI,
+  );
+}
+
+function printPlain(port) {
   const answer = whoHolds(port);
   if (!answer) {
     // No CLI, so there is nothing useful to add. Say so once, briefly, rather
@@ -83,6 +102,28 @@ function explain(chunk) {
     return;
   }
   process.stderr.write(`\n[tidyports] ${answer}\n`);
+}
+
+function explain(chunk) {
+  if (reported) return;
+  tail = (tail + chunk).slice(-TAIL_MAX);
+  const port = portFrom(tail);
+  if (!port) return;
+  reported = true;
+  tail = "";
+
+  if (!canPrompt()) {
+    printPlain(port);
+    return;
+  }
+  // Hold briefly to see whether the child is dying. `unref` so a wrapper around
+  // a long-lived server is never the reason the process stays up.
+  const timer = setTimeout(() => {
+    pending = null;
+    printPlain(port);
+  }, SETTLE_MS);
+  timer.unref?.();
+  pending = { port, timer };
 }
 
 const child = spawn(argv[0], argv.slice(1), {
@@ -108,6 +149,25 @@ child.on("error", (err) => {
 });
 
 child.on("close", (code, signal) => {
+  /* The child is gone, so the terminal is ours and the prompt can't collide with
+     anything. Skipped on a signal: ctrl-c means you wanted out, and answering a
+     question is not what you asked for. stdio is inherited so `who` sees a real
+     tty and offers its own choice — including the second confirmation before it
+     stops anything. */
+  if (pending) {
+    clearTimeout(pending.timer);
+    const { port } = pending;
+    pending = null;
+    if (signal) {
+      printPlain(port);
+    } else {
+      process.stderr.write("\n");
+      const res = spawnSync("tidy-ports", ["who", port], { stdio: "inherit" });
+      // No CLI to be interactive with, so fall back to saying what we can.
+      if (res.error) printPlain(port);
+    }
+  }
+
   // Reproduce how the child ended, so this is invisible to anything upstream:
   // a shell, a CI step, or an agent reading the exit status.
   if (signal) {

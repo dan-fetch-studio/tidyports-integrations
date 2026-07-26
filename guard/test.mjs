@@ -49,8 +49,15 @@ for (const [label, text, want] of CASES) {
 
 // ---- the wrapper stays out of the way ---------------------------------------
 
+/* The timeout is load-bearing: every run here is piped, so the guard must never
+   reach for a prompt. If it ever did, spawnSync would block until this fires and
+   the failure is visible, instead of the suite hanging with no explanation. */
 const run = (args, opts = {}) =>
-  spawnSync(process.execPath, [GUARD, ...args], { encoding: "utf8", ...opts });
+  spawnSync(process.execPath, [GUARD, ...args], {
+    encoding: "utf8",
+    timeout: 15000,
+    ...opts,
+  });
 
 let r = run(["node", "-e", "process.exit(0)"]);
 check(r.status === 0, "exit: success passes through", `got ${r.status}`);
@@ -86,6 +93,14 @@ r = run(["node", "-e", "require('net').createServer().listen(45771,'127.0.0.1')"
 check(r.status === 1, "bind failure keeps the child's exit code", `got ${r.status}`);
 check(r.stderr.includes("[tidyports]"), "bind failure is explained");
 check(r.stderr.includes("45771"), "the explanation names the port");
+
+/* Piped output is the agent/CI path, so it gets the copyable form and no prompt
+   — the interactive choice only belongs to a person whose terminal is free. */
+check(
+  r.stderr.includes("To take a different port:"),
+  "piped output keeps the plain, copyable form",
+);
+check(r.signal !== "SIGTERM", "piped output never blocks on a prompt", `signal ${r.signal}`);
 
 /* Regression: stderr arrives in whatever chunks the pipe hands over, and a
    message split mid-sentence was silently missed. Short errors usually do
