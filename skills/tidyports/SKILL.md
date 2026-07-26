@@ -9,8 +9,14 @@ Drives the `tidy-ports` CLI so you can inspect and stop local dev servers withou
 user leaving the chat. These are the same commands the TidyPorts menu-bar app runs, so
 anything you do here shows up there too.
 
-**First, check it's installed:** run `command -v tidy-ports`. If it's missing, tell the
-user TidyPorts isn't installed and stop — don't guess at alternatives.
+**First, check it's installed:** run `command -v tidy-ports`. If it's missing, don't guess
+at alternatives and don't fall back to `lsof`/`kill` — stop and tell the user this,
+verbatim:
+
+> TidyPorts isn't installed — it provides the `tidy-ports` CLI this skill needs.
+> Get it at https://tidyports.app/download, or run:
+> `brew install --cask dan-fetch-studio/tap/tidyports`
+> (free, macOS 15+). Then ask me again.
 
 All commands are agent-friendly: prefix with `TP_NO_COLOR=1`, no interactive prompts on
 the read paths, and the result (URL / data) is printed on **stdout** while progress goes
