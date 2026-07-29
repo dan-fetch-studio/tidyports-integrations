@@ -86,15 +86,38 @@ async function tidyPorts(args: string[], timeoutMs = 15000): Promise<string> {
  * dev server is.
  */
 const DEV_RUNTIMES = new Set([
-  "node", "bun", "deno", "ruby", "php", "java", "go",
-  "uvicorn", "gunicorn", "puma", "rails", "flask",
-  "dotnet", "mix", "elixir", "beam.smp", "cargo",
-  "vite", "astro", "storybook", "webpack", "tsx", "ts-node",
-  "next", "nuxt", "remix", "ng",
+  "node",
+  "bun",
+  "deno",
+  "ruby",
+  "php",
+  "java",
+  "go",
+  "uvicorn",
+  "gunicorn",
+  "puma",
+  "rails",
+  "flask",
+  "dotnet",
+  "mix",
+  "elixir",
+  "beam.smp",
+  "cargo",
+  "vite",
+  "astro",
+  "storybook",
+  "webpack",
+  "tsx",
+  "ts-node",
+  "next",
+  "nuxt",
+  "remix",
+  "ng",
 ]);
 
 export function isLikelyDevServer(l: Listener): boolean {
-  if (l.tag === "required" || l.tag === "context" || l.tag === "storybook") return true;
+  if (l.tag === "required" || l.tag === "context" || l.tag === "storybook")
+    return true;
   const name = (l.comm.split("/").pop() ?? "").toLowerCase();
   return (
     DEV_RUNTIMES.has(name) ||

@@ -4,7 +4,7 @@
   "title": "TidyPorts",
   "description": "See which dev servers are running on your Mac, which agent started each one, and kill the strays.",
   "icon": "command-icon.png",
-  "author": "dan_marek",
+  "author": "Dan_Marek",
   "categories": [
     "Developer Tools"
   ],
