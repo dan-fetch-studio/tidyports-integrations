@@ -2,7 +2,7 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "tidyports",
   "title": "TidyPorts",
-  "description": "See which dev servers are running on your Mac, which agent started each one, and kill the strays.",
+  "description": "See which dev servers are running on your Mac, which agent started each one, and kill the strays. Requires the free TidyPorts app, which provides the CLI this reads from.",
   "icon": "command-icon.png",
   "author": "Dan_Marek",
   "categories": [
